@@ -73,6 +73,9 @@ public abstract class Scheduling implements Comparator<Scheduling.Job> {
     private List<Job> jobs;
     private long weightedCompletionTime;
 
+    public Scheduling() {
+    }
+    
     public Scheduling(InputStream in) {
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
@@ -88,6 +91,8 @@ public abstract class Scheduling implements Comparator<Scheduling.Job> {
                 Logger.getLogger(Scheduling.class.getName()).fine(job.toString());
             }
             
+            process();
+            
         } catch (IOException ex) {
             Logger.getLogger(Scheduling.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -96,9 +101,12 @@ public abstract class Scheduling implements Comparator<Scheduling.Job> {
     
     public Scheduling(List<Job> jobs) {
         this.jobs = jobs;
+        process();
     }
     
-    public void process() {
+    public final void process() {
+        
+        Logger.getLogger(Scheduling.class.getName()).log(Level.INFO, "Processing jobs");
         Collections.sort(jobs, this);
         
         long completionTime = 0;
@@ -107,31 +115,28 @@ public abstract class Scheduling implements Comparator<Scheduling.Job> {
         for (Job job : jobs) {
             completionTime += job.getLength();
             weightedCompletionTime += (job.getWeight() * completionTime);
+            
+            Logger.getLogger(Scheduling.class.getName()).log(Level.FINE, 
+                "Job: {0} -> completion time: {1}; weight completion time: {2}", new Object[]{job.toString(), completionTime, String.valueOf(weightedCompletionTime)});
+            
         }
     }
 
     public List<Job> getJobs() {
-        return jobs;
+        return new ArrayList(jobs);
+    }
+    
+    public void addJob(Job job) {
+        
+        if (jobs == null) {
+            jobs = new ArrayList<>();
+        }
+        
+        jobs.add(job);
+        process();
     }
     
     public long getWeightedCompletionTime() {
         return weightedCompletionTime;
     }
-    
-    public static void main(String[] args) {
-
-        InputStream in = Scheduling.class
-                .getResourceAsStream("jobs.txt");
-        
-        Scheduling schedulingDiff = new SchedulingDifference(in);
-        schedulingDiff.process();
-        Logger.getLogger(Scheduling.class.getName()).info("Difference: " +
-                String.valueOf(schedulingDiff.getWeightedCompletionTime()));
-        
-        Scheduling schedulingRatio = new SchedulingRatio(schedulingDiff.getJobs());
-        schedulingRatio.process();
-        Logger.getLogger(Scheduling.class.getName()).info("Ratio: " +
-                String.valueOf(schedulingRatio.getWeightedCompletionTime()));
-    }
-    
 }

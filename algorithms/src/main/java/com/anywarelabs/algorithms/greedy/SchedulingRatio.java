@@ -33,6 +33,9 @@ import java.util.List;
  */
 public class SchedulingRatio extends Scheduling {
 
+    public SchedulingRatio() {
+    }
+    
     public SchedulingRatio(InputStream in) {
         super(in);
     }
@@ -47,6 +50,6 @@ public class SchedulingRatio extends Scheduling {
         Double ratio1 = o1.getWeight() * 1.0 / o1.getLength();
         Double ratio2 = o2.getWeight() * 1.0 / o2.getLength();
         
-        return ratio1.compareTo(ratio2);
+        return ratio2.compareTo(ratio1);
     }
 }

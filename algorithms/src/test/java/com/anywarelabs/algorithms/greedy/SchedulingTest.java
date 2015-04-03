@@ -26,37 +26,58 @@ package com.anywarelabs.algorithms.greedy;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  *
  * @author marciofonseca
  */
-public class SchedulingDifference extends Scheduling {
-
-    public SchedulingDifference() {
-    }
-
-    public SchedulingDifference(InputStream in) {
-        super(in);
-    }
-
-    public SchedulingDifference(List<Job> jobs) {
-        super(jobs);
+public class SchedulingTest {
+    
+    public SchedulingTest() {
     }
     
-    @Override
-    public int compare(Job o1, Job o2) {
+    @BeforeClass
+    public static void setUpClass() {
+    }
+    
+    @AfterClass
+    public static void tearDownClass() {
+    }
+    
+    @Before
+    public void setUp() {
+    }
+    
+    @After
+    public void tearDown() {
+    }
+
+    /**
+     * Test of getWeightedCompletionTime method, of class Scheduling.
+     */
+    @Test
+    public void testGetWeightedCompletionTime() {
         
-        Integer diff1 = o1.getWeight() - o1.getLength();
-        Integer diff2 = o2.getWeight() - o2.getLength();
+        InputStream in = Scheduling.class
+                .getResourceAsStream("jobs.txt");
         
-        int comparison = diff2.compareTo(diff1);
+        Scheduling schedulingDiff = new SchedulingDifference(in);
+        Logger.getLogger(Scheduling.class.getName()).log(Level.INFO, 
+                "Difference: {0}", String.valueOf(schedulingDiff.getWeightedCompletionTime()));
         
-        if (comparison == 0) {
-            return o2.getWeight().compareTo(o1.getWeight());
-        }
+        Scheduling schedulingRatio = new SchedulingRatio(schedulingDiff.getJobs());
+        Logger.getLogger(Scheduling.class.getName()).log(Level.INFO, 
+                "Ratio: {0}", String.valueOf(schedulingRatio.getWeightedCompletionTime()));
         
-        return comparison;
+        assertTrue(schedulingRatio.getWeightedCompletionTime() <= schedulingDiff.getWeightedCompletionTime());
     }
     
 }
