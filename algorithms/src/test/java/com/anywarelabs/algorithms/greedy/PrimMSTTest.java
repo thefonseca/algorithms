@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2015 marciofonseca.
+ * Copyright 2015 Marcio Fonseca.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,9 +24,6 @@
 
 package com.anywarelabs.algorithms.greedy;
 
-import java.io.InputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -36,11 +33,11 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author marciofonseca
+ * @author Marcio Fonseca
  */
-public class SchedulingTest {
+public class PrimMSTTest {
     
-    public SchedulingTest() {
+    public PrimMSTTest() {
     }
     
     @BeforeClass
@@ -60,24 +57,31 @@ public class SchedulingTest {
     }
 
     /**
-     * Test of getWeightedCompletionTime method, of class Scheduling.
+     * Test of getMST method, of class PrimMST.
      */
     @Test
-    public void testGetWeightedCompletionTime() {
+    public void testGetMST() {
+        System.out.println("getMST");
         
-        InputStream in = Scheduling.class
-                .getResourceAsStream("jobs.txt");
+        Graph g = new Graph(Graph.class.getResourceAsStream("edges2.txt"));
+        Graph result = PrimMST.getMST(g);
         
-        Scheduling schedulingDiff = new SchedulingDifference(in);
-        Logger.getLogger(Scheduling.class.getName()).log(Level.INFO, 
-                "Difference: {0}", String.valueOf(schedulingDiff.getWeightedCompletionTime()));
+        Integer expResult = 113;
+        assertEquals(expResult, result.getTotalEdgeCost());
         
-        Scheduling schedulingRatio = new SchedulingRatio(schedulingDiff.getJobs());
-        Logger.getLogger(Scheduling.class.getName()).log(Level.INFO, 
-                "Ratio: {0}", String.valueOf(schedulingRatio.getWeightedCompletionTime()));
+        g = new Graph(Graph.class.getResourceAsStream("edges3.txt"));
+        result = PrimMST.getMST(g);
         
-        // since greedy choice based on ratio is always optimal, the following inequality should be true
-        assertTrue(schedulingRatio.getWeightedCompletionTime() <= schedulingDiff.getWeightedCompletionTime());
+        expResult = 89;
+        assertEquals(expResult, result.getTotalEdgeCost());
+        
+        g = new Graph(Graph.class.getResourceAsStream("edges1.txt"));
+        result = PrimMST.getMST(g);
+        System.out.println("MST cost: " + result.getTotalEdgeCost());
+        
+        //expResult = 89;
+        //assertEquals(expResult, result.getTotalEdgeCost());
+        
     }
     
 }
