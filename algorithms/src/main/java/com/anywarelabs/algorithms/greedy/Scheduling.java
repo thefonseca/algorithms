@@ -106,7 +106,8 @@ public abstract class Scheduling implements Comparator<Scheduling.Job> {
     
     public final void process() {
         
-        Logger.getLogger(Scheduling.class.getName()).log(Level.INFO, "Processing jobs");
+        Logger.getLogger(Scheduling.class.getName())
+                .log(Level.INFO, "Processing jobs");
         Collections.sort(jobs, this);
         
         long completionTime = 0;
@@ -117,7 +118,9 @@ public abstract class Scheduling implements Comparator<Scheduling.Job> {
             weightedCompletionTime += (job.getWeight() * completionTime);
             
             Logger.getLogger(Scheduling.class.getName()).log(Level.FINE, 
-                "Job: {0} -> completion time: {1}; weight completion time: {2}", new Object[]{job.toString(), completionTime, String.valueOf(weightedCompletionTime)});
+                "Job: {0} -> completion time: {1}; weight completion time: {2}",
+                new Object[]{job.toString(), completionTime,
+                    String.valueOf(weightedCompletionTime)});
             
         }
     }

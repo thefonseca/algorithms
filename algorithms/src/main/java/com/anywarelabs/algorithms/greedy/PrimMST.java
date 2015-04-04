@@ -24,6 +24,7 @@
 
 package com.anywarelabs.algorithms.greedy;
 
+import com.anywarelabs.algorithms.datastructures.Graph;
 import java.util.PriorityQueue;
 import java.util.Queue;
 

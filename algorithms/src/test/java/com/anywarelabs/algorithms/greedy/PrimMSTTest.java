@@ -24,6 +24,7 @@
 
 package com.anywarelabs.algorithms.greedy;
 
+import com.anywarelabs.algorithms.datastructures.Graph;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -63,25 +64,21 @@ public class PrimMSTTest {
     public void testGetMST() {
         System.out.println("getMST");
         
-        Graph g = new Graph(Graph.class.getResourceAsStream("edges2.txt"));
+        Graph g = new Graph(PrimMST.class.getResourceAsStream("edges2.txt"));
         Graph result = PrimMST.getMST(g);
         
         Integer expResult = 113;
         assertEquals(expResult, result.getTotalEdgeCost());
         
-        g = new Graph(Graph.class.getResourceAsStream("edges3.txt"));
+        g = new Graph(PrimMST.class.getResourceAsStream("edges3.txt"));
         result = PrimMST.getMST(g);
         
         expResult = 89;
         assertEquals(expResult, result.getTotalEdgeCost());
         
-        g = new Graph(Graph.class.getResourceAsStream("edges1.txt"));
+        g = new Graph(PrimMST.class.getResourceAsStream("edges1.txt"));
         result = PrimMST.getMST(g);
         System.out.println("MST cost: " + result.getTotalEdgeCost());
-        
-        //expResult = 89;
-        //assertEquals(expResult, result.getTotalEdgeCost());
-        
     }
     
 }
