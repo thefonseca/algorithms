@@ -33,9 +33,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -77,26 +75,48 @@ public class MaxSpacingKClustering {
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
             
             String line = reader.readLine();
+            String[] lineSplit = line.split(" ");
             
-            Map<String, Node> nodeMap = new HashMap<>();
-            List<Node> nodes = new ArrayList<>();
+            //Integer nodeCount;
+            Integer bitCount = Integer.parseInt(lineSplit[1]);
             
+            int[] allNodes = new int[(int)Math.pow(2, bitCount)];
             int index = 0;
+            
+            for (int i = 0; i < allNodes.length; i++) {
+                allNodes[i] = -1;
+            }
+            
+            List<Integer> nodeList = new ArrayList<>();
+            
             while((line = reader.readLine()) != null) {
                 
-                String label = line.replaceAll(" ", "");
+                //String label = line.replaceAll(" ", "");
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < line.length(); i++) {
+                    char c = line.charAt(i);
+                    
+                    if (c != ' ') {
+                        sb.append(c);
+                    }
+                }
                 
-                if (nodeMap.get(label) == null) {
-                    Node node = new Node(label, index);
-                    nodes.add(node);
-                    nodeMap.put(label, node);
+                int node = Integer.parseInt(sb.toString(), 2);
+                
+                if (allNodes[node] < 0) {
+                    allNodes[node] = index;
+                    nodeList.add(index, node);
                     index++;
                 }
             }
             
-            Collections.sort(nodes);
+            int[] nodes = new int[nodeList.size()];
             
-            return createCluster(nodes, nodeMap, minSpacing);
+            for (int i = 0; i < nodeList.size(); i++) {
+                nodes[i] = nodeList.get(i);
+            }
+            
+            return createCluster(nodes, allNodes, bitCount, minSpacing);
             
         } catch(IOException ex) {
             Logger.getLogger(Scheduling.class.getName())
@@ -106,96 +126,59 @@ public class MaxSpacingKClustering {
         return null;
     }
     
-    private static KCluster createCluster(List<Node> nodes, 
-            Map<String, Node> nodeMap, int minSpacing) {
+    private static KCluster createCluster(int[] nodes, int[] allNodes,
+            int bitCount, int minSpacing) {
         
-        KCluster cluster = new KCluster(nodes.size(), 1);
+        KCluster cluster = new KCluster(nodes.length, 1);
         
-        for (Node node : nodes) {
+        for (int i = 0; i < nodes.length; i++) {
             
             int counter = minSpacing - 1;
-            unionNearNodes(node, node, nodeMap, cluster, counter);
+            unionNearNodes(nodes[i], getBitChanges(nodes[i], bitCount),
+                    nodes, allNodes, cluster, counter);
         }
         
         return cluster;
     }
     
-    private static void unionNearNodes(Node node, Node original, Map<String, Node> nodeMap,
-            KCluster cluster, int counter) {
+    private static void unionNearNodes(int node, int[] bitChanges,
+            int[] nodes, int[] allNodes, KCluster cluster, int counter) {
         
         counter--;
         
-        for (String bitChange : getBitChanges(node.getLabel())) {
+        for (int bitChange : bitChanges) {
                     
-            if (bitChange.compareTo(original.getLabel()) < 0) {
+            if (bitChange < node) {
                 continue;
             }
-
-            Node bitChangeNode = nodeMap.get(bitChange);
-            if (bitChangeNode != null) {
-                cluster.union(node.getIndex(), bitChangeNode.getIndex());
-                
-            } else {
-                bitChangeNode = new Node(bitChange, original.getIndex());
+            
+            if (allNodes[bitChange] >= 0) {
+                cluster.union(allNodes[node], allNodes[bitChange]);
             }
             
             if (counter > 0) {
-                unionNearNodes(bitChangeNode, original, nodeMap, cluster, counter);
+                unionNearNodes(node, getBitChanges(bitChange,
+                        bitChanges.length), nodes, allNodes, cluster, counter);
             }
         }
     }
     
-    private static List<String> getBitChanges(String str) {
+    private static int[] getBitChanges(int i, int bitCount) {
         
-        List<String> changes = new ArrayList<>();
+        int[] changes = new int[bitCount];
         
-        char[] c = str.toCharArray();
-        
-        for (int i = c.length - 1; i >= 0; i--) {
+        for (int k = 0; k < changes.length; k++) {
             
-            char aux = c[i];
-            c[i] = c[i] == '1' ? '0' : '1';
-            String s = String.valueOf(c, 0, c.length);
-            changes.add(s);
-            c[i] = aux;
+            changes[k] = i ^ (0x1 << k);
         }
         
         return changes;
     }
     
-    private static class Node implements Comparable<Node> {
-        private String label;
-        private int index;
-
-        public Node(String label, int index) {
-            this.label = label;
-            this.index = index;
-        }
-
-        public String getLabel() {
-            return label;
-        }
-
-        public void setLabel(String label) {
-            this.label = label;
-        }
-
-        public int getIndex() {
-            return index;
-        }
-
-        public void setIndex(int Index) {
-            this.index = Index;
-        }
-
-        @Override
-        public int compareTo(Node o) {
-            return this.getLabel().compareTo(o.getLabel());
-        }
-
-        @Override
-        public String toString() {
-            return "Node{" + "label=" + label + ", index=" + index + '}';
-        }
+    public static void main(String[] args) {
+        InputStream in = MaxSpacingKClustering.class.getResourceAsStream("clustering_big.txt");
+        KCluster result = MaxSpacingKClustering.getKClusterBinaryStrings(in, 3);
+        
+        System.out.println("Max number of k: " + result.getClusterCount());
     }
 }
