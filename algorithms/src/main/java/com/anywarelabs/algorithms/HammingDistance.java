@@ -48,4 +48,18 @@ public class HammingDistance {
         
         return distance;
     }
+    
+    public static int getDistance(int n1, int n2) {
+        
+        short dist = 0;
+        int val = n1^n2;
+        
+        while(val > 0) {
+          ++dist; 
+          val &= val - 1;
+        }
+        
+        System.out.println(dist);
+        return dist;
+    }
 }
