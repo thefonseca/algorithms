@@ -84,13 +84,12 @@ public class UnionFind {
     
     private int root(int n) {
         
-        int root;
-        while((root = elements[n]) != n) {
-            elements[n] = elements[root];
-            n = root;
+        while(elements[n] != n) {
+            elements[n] = elements[elements[n]];
+            n = elements[n];
         }
         
-        return root;
+        return n;
     }
     
 }
