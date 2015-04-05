@@ -93,8 +93,20 @@ public class MaxSpacingKClusteringTest {
     @Test
     public void testGetKClusterBinaryStrings() {
         
-        InputStream in = MaxSpacingKClustering.class.getResourceAsStream("clustering_big.txt");
-        KCluster result = MaxSpacingKClustering.getKClusterBinaryStrings(in, 3);
+        InputStream in = MaxSpacingKClustering.class.getResourceAsStream("clustering_small2.txt");
+        KCluster result = MaxSpacingKClustering.getKClusterBinaryStrings(in, 2);
+        
+        int expResult = 2;
+        assertEquals(expResult, result.getClusterCount());
+        
+        in = MaxSpacingKClustering.class.getResourceAsStream("clustering_small.txt");
+        result = MaxSpacingKClustering.getKClusterBinaryStrings(in, 2);
+        
+        expResult = 2;
+        assertEquals(expResult, result.getClusterCount());
+        
+        in = MaxSpacingKClustering.class.getResourceAsStream("clustering_big.txt");
+        result = MaxSpacingKClustering.getKClusterBinaryStrings(in, 3);
         
         System.out.println("Max number of k: " + result.getClusterCount());
     }

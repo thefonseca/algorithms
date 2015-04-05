@@ -109,7 +109,7 @@ public class MaxSpacingKClustering {
     private static KCluster createCluster(List<Node> nodes, 
             Map<String, Node> nodeMap, int minSpacing) {
         
-        KCluster cluster = new KCluster(nodes.size(), 0);
+        KCluster cluster = new KCluster(nodes.size(), 1);
         
         for (Node node : nodes) {
             
@@ -134,7 +134,7 @@ public class MaxSpacingKClustering {
             Node bitChangeNode = nodeMap.get(bitChange);
             if (bitChangeNode != null) {
                 cluster.union(node.getIndex(), bitChangeNode.getIndex());
-            
+                
             } else {
                 bitChangeNode = new Node(bitChange, original.getIndex());
             }
@@ -191,6 +191,11 @@ public class MaxSpacingKClustering {
         @Override
         public int compareTo(Node o) {
             return this.getLabel().compareTo(o.getLabel());
+        }
+
+        @Override
+        public String toString() {
+            return "Node{" + "label=" + label + ", index=" + index + '}';
         }
     }
 }
