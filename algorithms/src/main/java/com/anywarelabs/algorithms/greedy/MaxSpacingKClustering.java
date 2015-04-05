@@ -24,6 +24,7 @@
 
 package com.anywarelabs.algorithms.greedy;
 
+import com.anywarelabs.algorithms.HammingDistance;
 import com.anywarelabs.algorithms.datastructures.Graph;
 import com.anywarelabs.algorithms.datastructures.Graph.Edge;
 import com.anywarelabs.algorithms.datastructures.KCluster;
@@ -32,8 +33,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -91,19 +94,16 @@ public class MaxSpacingKClustering {
             
             while((line = reader.readLine()) != null) {
                 
-                //String label = line.replaceAll(" ", "");
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < line.length(); i++) {
-                    char c = line.charAt(i);
-                    
-                    if (c != ' ') {
-                        sb.append(c);
-                    }
+                StringTokenizer parser = new StringTokenizer(line);
+                int count = 0;
+                int node = 0;
+                
+                while (parser.hasMoreTokens()) {
+                    node = node ^ (Integer.parseInt(parser.nextToken()) << count++);
                 }
                 
-                int node = Integer.parseInt(sb.toString(), 2);
-                
                 if (allNodes[node] < 0) {
+                    
                     allNodes[node] = index;
                     nodeList.add(index, node);
                     index++;
@@ -130,19 +130,20 @@ public class MaxSpacingKClustering {
             int bitCount, int minSpacing) {
         
         KCluster cluster = new KCluster(nodes.length, 1);
+        Arrays.sort(nodes);
         
         for (int i = 0; i < nodes.length; i++) {
             
             int counter = minSpacing - 1;
             unionNearNodes(nodes[i], getBitChanges(nodes[i], bitCount),
-                    nodes, allNodes, cluster, counter);
+                    allNodes, cluster, counter);
         }
         
         return cluster;
     }
     
-    private static void unionNearNodes(int node, int[] bitChanges,
-            int[] nodes, int[] allNodes, KCluster cluster, int counter) {
+    private static void unionNearNodes(int node, int[] bitChanges, 
+            int[] allNodes, KCluster cluster, int counter) {
         
         counter--;
         
@@ -158,13 +159,12 @@ public class MaxSpacingKClustering {
             
             if (counter > 0) {
                 unionNearNodes(node, getBitChanges(bitChange,
-                        bitChanges.length), nodes, allNodes, cluster, counter);
+                        bitChanges.length), allNodes, cluster, counter);
             }
         }
     }
     
     private static int[] getBitChanges(int i, int bitCount) {
-        
         int[] changes = new int[bitCount];
         
         for (int k = 0; k < changes.length; k++) {

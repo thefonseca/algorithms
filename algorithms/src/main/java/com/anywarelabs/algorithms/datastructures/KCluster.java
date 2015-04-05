@@ -42,9 +42,10 @@ public class KCluster extends UnionFind {
         
         if (getClusterCount() > targetClusterCount) {
             union(a, b);
+            return;
         }
         
-        if (!connected(a, b) && getClusterCount() == targetClusterCount) {
+        if (getClusterCount() == targetClusterCount) {
             
             if (spacing == null || spacing > distance) {
                 spacing = distance;
