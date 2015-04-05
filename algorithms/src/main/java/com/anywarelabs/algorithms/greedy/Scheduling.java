@@ -107,7 +107,7 @@ public abstract class Scheduling implements Comparator<Scheduling.Job> {
     public final void process() {
         
         Logger.getLogger(Scheduling.class.getName())
-                .log(Level.INFO, "Processing jobs");
+                .log(Level.FINE, "Processing jobs");
         Collections.sort(jobs, this);
         
         long completionTime = 0;

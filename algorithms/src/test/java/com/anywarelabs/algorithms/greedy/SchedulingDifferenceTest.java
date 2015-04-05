@@ -61,8 +61,6 @@ public class SchedulingDifferenceTest {
      */
     @Test
     public void testCompare() {
-        System.out.println("compare");
-        
         SchedulingDifference instance = new SchedulingDifference();
         Scheduling.Job o1 = instance.new Job("4 2");
         Scheduling.Job o2 = instance.new Job("3 2");

@@ -58,8 +58,6 @@ public class SchedulingRatioTest {
      */
     @Test
     public void testCompare() {
-        System.out.println("compare");
-        
         SchedulingRatio instance = new SchedulingRatio();
         Scheduling.Job o1 = instance.new Job("4 2");
         Scheduling.Job o2 = instance.new Job("3 2");

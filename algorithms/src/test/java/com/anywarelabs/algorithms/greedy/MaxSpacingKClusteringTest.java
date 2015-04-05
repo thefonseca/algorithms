@@ -25,20 +25,21 @@ package com.anywarelabs.algorithms.greedy;
 
 import com.anywarelabs.algorithms.datastructures.Graph;
 import com.anywarelabs.algorithms.datastructures.KCluster;
+import java.io.InputStream;
 import org.junit.After;
 import org.junit.AfterClass;
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
  * @author Marcio Fonseca
  */
-public class KClusteringTest {
+public class MaxSpacingKClusteringTest {
     
-    public KClusteringTest() {
+    public MaxSpacingKClusteringTest() {
     }
     
     @BeforeClass
@@ -58,7 +59,7 @@ public class KClusteringTest {
     }
 
     /**
-     * Test of getKCluster method, of class KClustering.
+     * Test of getKCluster method, of class MaxSpacingKClustering.
      */
     @Test
     public void testGetKCluster() {
@@ -84,6 +85,18 @@ public class KClusteringTest {
         g = new Graph(MaxSpacingKClustering.class.getResourceAsStream("clustering1.txt"));
         result = MaxSpacingKClustering.getKCluster(g, 4);
         System.out.println("Cluster spacing: " + result.getSpacing());
+    }
+
+    /**
+     * Test of getKClusterBinaryStrings method, of class MaxSpacingKClustering.
+     */
+    @Test
+    public void testGetKClusterBinaryStrings() {
+        
+        InputStream in = MaxSpacingKClustering.class.getResourceAsStream("clustering_big.txt");
+        KCluster result = MaxSpacingKClustering.getKClusterBinaryStrings(in, 3);
+        
+        System.out.println("Max number of k: " + result.getClusterCount());
     }
     
 }

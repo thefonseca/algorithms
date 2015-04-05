@@ -155,6 +155,9 @@ public class Graph {
     List<Edge> edges;
     Integer totalEdgeCost;
     
+    public Graph() {
+    }
+    
     public Graph(int vertexCount) {
         
         vertices = new ArrayList<>(vertexCount);

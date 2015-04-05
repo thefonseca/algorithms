@@ -27,8 +27,17 @@ package com.anywarelabs.algorithms.greedy;
 import com.anywarelabs.algorithms.datastructures.Graph;
 import com.anywarelabs.algorithms.datastructures.Graph.Edge;
 import com.anywarelabs.algorithms.datastructures.KCluster;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Max Spacing k-order Cluster based on Kruskal MST algorithm.
@@ -37,12 +46,12 @@ import java.util.List;
  */
 public class MaxSpacingKClustering {
     
-    public static KCluster getKCluster(Graph g, int k) {
+    public static KCluster getKCluster(Graph g, int clusterCount) {
         
         List<Edge> edges = g.getEdges();
         Collections.sort(edges);
         
-        KCluster cluster = new KCluster(g.getVertices().size(), k);
+        KCluster cluster = new KCluster(g.getVertices().size(), clusterCount);
         
         for (Edge edge : edges) {
             
@@ -57,9 +66,131 @@ public class MaxSpacingKClustering {
                 
                 cluster.union(either, other, edge.getCost());
             }
-            
         }
         
         return cluster;
+    }
+    
+    
+    public static KCluster getKClusterBinaryStrings(InputStream in, int minSpacing) {
+        
+        try(BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+            
+            String line = reader.readLine();
+            
+            Map<String, Node> nodeMap = new HashMap<>();
+            List<Node> nodes = new ArrayList<>();
+            
+            int index = 0;
+            while((line = reader.readLine()) != null) {
+                
+                String label = line.replaceAll(" ", "");
+                
+                if (nodeMap.get(label) == null) {
+                    Node node = new Node(label, index);
+                    nodes.add(node);
+                    nodeMap.put(label, node);
+                    index++;
+                }
+            }
+            
+            Collections.sort(nodes);
+            
+            return createCluster(nodes, nodeMap, minSpacing);
+            
+        } catch(IOException ex) {
+            Logger.getLogger(Scheduling.class.getName())
+                    .log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
+    }
+    
+    private static KCluster createCluster(List<Node> nodes, 
+            Map<String, Node> nodeMap, int minSpacing) {
+        
+        KCluster cluster = new KCluster(nodes.size(), 0);
+        
+        for (Node node : nodes) {
+            
+            int counter = minSpacing - 1;
+            unionNearNodes(node, node, nodeMap, cluster, counter);
+        }
+        
+        return cluster;
+    }
+    
+    private static void unionNearNodes(Node node, Node original, Map<String, Node> nodeMap,
+            KCluster cluster, int counter) {
+        
+        counter--;
+        
+        for (String bitChange : getBitChanges(node.getLabel())) {
+                    
+            if (bitChange.compareTo(original.getLabel()) < 0) {
+                continue;
+            }
+
+            Node bitChangeNode = nodeMap.get(bitChange);
+            if (bitChangeNode != null) {
+                cluster.union(node.getIndex(), bitChangeNode.getIndex());
+            
+            } else {
+                bitChangeNode = new Node(bitChange, original.getIndex());
+            }
+            
+            if (counter > 0) {
+                unionNearNodes(bitChangeNode, original, nodeMap, cluster, counter);
+            }
+        }
+    }
+    
+    private static List<String> getBitChanges(String str) {
+        
+        List<String> changes = new ArrayList<>();
+        
+        char[] c = str.toCharArray();
+        
+        for (int i = c.length - 1; i >= 0; i--) {
+            
+            char aux = c[i];
+            c[i] = c[i] == '1' ? '0' : '1';
+            String s = String.valueOf(c, 0, c.length);
+            changes.add(s);
+            c[i] = aux;
+        }
+        
+        return changes;
+    }
+    
+    private static class Node implements Comparable<Node> {
+        private String label;
+        private int index;
+
+        public Node(String label, int index) {
+            this.label = label;
+            this.index = index;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public void setLabel(String label) {
+            this.label = label;
+        }
+
+        public int getIndex() {
+            return index;
+        }
+
+        public void setIndex(int Index) {
+            this.index = Index;
+        }
+
+        @Override
+        public int compareTo(Node o) {
+            return this.getLabel().compareTo(o.getLabel());
+        }
     }
 }
