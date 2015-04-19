@@ -24,7 +24,6 @@
 
 package com.anywarelabs.algorithms.greedy;
 
-import com.anywarelabs.algorithms.HammingDistance;
 import com.anywarelabs.algorithms.datastructures.Graph;
 import com.anywarelabs.algorithms.datastructures.Graph.Edge;
 import com.anywarelabs.algorithms.datastructures.KCluster;
@@ -177,7 +176,8 @@ public class MaxSpacingKClustering {
     
     public static void main(String[] args) {
         InputStream in = MaxSpacingKClustering.class.getResourceAsStream("clustering_big.txt");
-        KCluster result = MaxSpacingKClustering.getKClusterBinaryStrings(in, 3);
+        KCluster result;
+        result = MaxSpacingKClustering.getKClusterBinaryStrings(in, 3);
         
         System.out.println("Max number of k: " + result.getClusterCount());
     }
