@@ -28,6 +28,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -76,7 +78,8 @@ public class Knapsack {
     public int getMaximumValue(InputStream in) {
         
         int[][] allItems = processInput(in);
-        return Knapsack.getMaximumValue(allItems, maximumWeight);
+        //return Knapsack.getMaximumValue(allItems, maximumWeight);
+        return Knapsack.getMaximumValueRecursive(allItems, allItems.length, maximumWeight);
     }
     
     public static int getMaximumValue(int[][] items, int maximumWeight) {
@@ -98,5 +101,58 @@ public class Knapsack {
         }
         
         return a[items.length][maximumWeight];
+    }
+    
+    public static Map<String, Integer> memoization;
+    
+    public static int getMaximumValueRecursive(int[][] items, int itemCount,
+            int maximumWeight) {
+        
+        if (items.length == itemCount) { // reset hash map
+            memoization = new HashMap<>();
+        }
+        
+        if (itemCount == 1) {
+            return items[0][1] <= maximumWeight ? items[0][1] : 0;
+        }
+        
+        Integer value = getMemoized(itemCount, maximumWeight);
+        if (value != null) {
+            return value;
+        }
+        
+        int value1, value2 = 0;
+        
+        value1 = getMaximumValueRecursive(items, itemCount - 1, maximumWeight);
+        
+        if (maximumWeight >= items[itemCount - 1][1]) {
+            value2 = items[itemCount - 1][0] + getMaximumValueRecursive(items,
+                    itemCount - 1, maximumWeight - items[itemCount - 1][1]);
+        }
+        
+        value = Math.max(value1, value2);
+        memoize(itemCount, maximumWeight, value);
+        
+        return Math.max(value1, value2);
+    }
+    
+    private static void memoize(int itemCount, int maximumWeight, int value) {
+        
+        if (memoization == null) {
+            memoization = new HashMap<>();
+        }
+        
+        String key = itemCount + ";" + maximumWeight;
+        memoization.put(key, value);
+    }
+    
+    private static Integer getMemoized(int itemCount, int maximumWeight) {
+        
+        if (memoization == null) {
+            return null;
+        }
+        
+        String key = itemCount + ";" + maximumWeight;
+        return memoization.get(key);
     }
 }

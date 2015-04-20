@@ -65,8 +65,6 @@ public class KnapsackTest {
         int result = new Knapsack().getMaximumValue(in);
         
         System.out.println(result);
-        //int expResult = 2;
-        //assertEquals(expResult, result.getClusterCount());
         
         in = Knapsack.class.getResourceAsStream("knapsack2.txt");
         result = new Knapsack().getMaximumValue(in);
