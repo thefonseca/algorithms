@@ -38,58 +38,65 @@ import java.util.logging.Logger;
  */
 public class Knapsack {
 
-    public static int getMaximumValue(InputStream in) {
-
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+    private int[][] items;
+    private int maximumWeight;
+    
+    private int[][] processInput(InputStream in) {
+        
+        try (BufferedReader reader = 
+                new BufferedReader(new InputStreamReader(in))) {
 
             String line = reader.readLine();
             String[] lineSplit = line.split(" ");
 
-            int knapsackSize = Integer.parseInt(lineSplit[1]);
+            maximumWeight = Integer.parseInt(lineSplit[0]);
             int itemCount = Integer.parseInt(lineSplit[1]);
 
-            int[][] items = new int[itemCount][2];
+            int[][] allItems = new int[itemCount][2];
 
             int count = 0;
 
             while ((line = reader.readLine()) != null) {
                 StringTokenizer parser = new StringTokenizer(line);
-                items[count][0] = Integer.parseInt(parser.nextToken());
-                items[count][1] = Integer.parseInt(parser.nextToken());
+                allItems[count][0] = Integer.parseInt(parser.nextToken());
+                allItems[count][1] = Integer.parseInt(parser.nextToken());
                 count++;
             }
-
-            return getMaximumValue(items, knapsackSize);
+            
+            return allItems;
 
         } catch (IOException ex) {
             Logger.getLogger(Scheduling.class.getName())
                     .log(Level.SEVERE, null, ex);
         }
-
-        return -1;
+        
+        return null;
     }
     
-    public static int getMaximumValue(int[][] items, int knapsackSize) {
+    public int getMaximumValue(InputStream in) {
         
-        int[][] a = new int[items.length][knapsackSize];
+        int[][] allItems = processInput(in);
+        return Knapsack.getMaximumValue(allItems, maximumWeight);
+    }
+    
+    public static int getMaximumValue(int[][] items, int maximumWeight) {
         
-        for (int i = 0; i < items.length; i++) {
-            a[0][i] = 0;
-        }
+        int[][] a = new int[items.length + 1][maximumWeight + 1];
         
-        for (int i = 1; i < items.length; i++) {
-            for (int j = 0; j < knapsackSize; j++) {
+        for (int i = 1; i <= items.length; i++) {
+            for (int w = 0; w <= maximumWeight; w++) {
             
-                if (j-a[i][1] >= 0) {
+                if (w >= items[i-1][1]) {
                 
-                    a[i][j] = Math.max(a[i-1][j], a[i-1][j-a[i][1]] + items[i][0]);
+                    a[i][w] = Math.max(a[i-1][w], 
+                            a[i-1][w - items[i-1][1]] + items[i-1][0]);
                 
                 } else {
-                    a[i][j] = a[i-1][j];
+                    a[i][w] = a[i-1][w];
                 }
             }
         }
         
-        return a[items.length - 1][0];
+        return a[items.length][maximumWeight];
     }
 }

@@ -62,11 +62,30 @@ public class KnapsackTest {
     @Test
     public void testGetMaximumValue_InputStream() {
         InputStream in = Knapsack.class.getResourceAsStream("knapsack1.txt");
-        int result = Knapsack.getMaximumValue(in);
+        int result = new Knapsack().getMaximumValue(in);
         
         System.out.println(result);
         //int expResult = 2;
         //assertEquals(expResult, result.getClusterCount());
+        
+        in = Knapsack.class.getResourceAsStream("knapsack2.txt");
+        result = new Knapsack().getMaximumValue(in);
+        
+        System.out.println(result);
+        int expResult = 90;
+        assertEquals(expResult, result);
+        
+        in = Knapsack.class.getResourceAsStream("knapsack3.txt");
+        result = new Knapsack().getMaximumValue(in);
+        
+        System.out.println(result);
+        expResult = 220;
+        assertEquals(expResult, result);
+        
+        in = Knapsack.class.getResourceAsStream("knapsack_big.txt");
+        result = new Knapsack().getMaximumValue(in);
+        
+        System.out.println(result);
     }
     
 }
