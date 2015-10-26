@@ -24,6 +24,7 @@
 package com.anywarelabs.algorithms;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -44,10 +45,11 @@ public class Sorting {
      * The implementation uses a modified version of merge sort algorithm that
      * counts the number of inversions found in the original list.
      * 
-     * @param list
+     * @param <T>
+     * @param list the list to be sorted.
      * @return the number of inversions found in the original list.
      */
-    public long mergeSort(List<Integer> list) {
+    public <T extends Comparable> long mergeSort(List<T> list) {
         return mergeSortImpl(list, 0, list.size() - 1);
     }
     
@@ -55,12 +57,12 @@ public class Sorting {
      * Merge sort implementation. The original list parameter is modified to 
      * avoid using additional space.
      * 
-     * @param list
+     * @param list the list to be sorted.
      * @param start
      * @param end
-     * @return 
+     * @return the number of inversions found in the original list.
      */
-    private long mergeSortImpl(List<Integer> list, int start, int end) {
+    private <T extends Comparable> long mergeSortImpl(List<T> list, int start, int end) {
         
         if (end - start + 1 == 1) {
             return 0;
@@ -75,21 +77,21 @@ public class Sorting {
     }
 
     /**
-     * Merges 
+     * Merge step for the merge sort algorithm. 
      * 
-     * @param list
+     * @param list the list to be sorted.
      * @param start
      * @param mid
      * @param end
      * @return 
      */
-    private long merge(List<Integer> list, int start, int mid, int end) {
+    private  <T extends Comparable> long merge(List<T> list, int start, int mid, int end) {
         
         int i = start;
         int j = mid + 1;
         long inversions = 0;
         
-        List<Integer> merged = new ArrayList(end - start + 1);
+        List merged = new ArrayList(end - start + 1);
         
         for (int k = start; k <= end; k++) {
             merged.add(null);
@@ -110,7 +112,8 @@ public class Sorting {
             mergedIndex++;
         }
         
-        for (Integer val : merged) {
+        for (Iterator it = merged.iterator(); it.hasNext();) {
+            T val = (T) it.next();
             list.set(start++, val);
         }
         
