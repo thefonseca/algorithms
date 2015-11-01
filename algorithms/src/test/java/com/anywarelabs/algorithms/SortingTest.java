@@ -67,7 +67,7 @@ public class SortingTest {
     /**
      * Test of mergeSort method, of class Sorting.
      */
-    //@Test
+    @Test
     public void testMergeSort() {
         System.out.println("mergeSort");
         
