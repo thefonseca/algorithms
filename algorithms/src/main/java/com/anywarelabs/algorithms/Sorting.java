@@ -24,6 +24,7 @@
 package com.anywarelabs.algorithms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -32,6 +33,138 @@ import java.util.List;
  * @author Marcio Fonseca
  */
 public class Sorting {
+    
+    /**
+     * Sorts the specified array into ascending numerical order.
+     *
+     * <p>Implementation note: The sorting algorithm is a traditional one-pivot
+     * Quicksort.
+     * 
+     * @param array the array to be sorted
+     * @return number of comparisons performed
+     */
+    public int quicksort(int[] array) {
+        return quicksort(array, 0, array.length - 1,
+                PivotStrategy.MEDIAN_OF_THREE);
+    }
+    
+    /**
+     * Sorts the specified array into ascending numerical order.
+     * 
+     * <p>Implementation note: The sorting algorithm is a traditional one-pivot
+     * Quicksort.
+     * 
+     * @param array
+     * @param pivotStrategy rule for choosing pivots
+     * @return number of comparisons performed
+     */
+    public int quicksort(int[] array, PivotStrategy pivotStrategy) {
+        return quicksort(array, 0, array.length - 1, pivotStrategy);
+    }
+    
+    private int quicksort(int[] array, int low, int high,
+            PivotStrategy pivotStrategy) {
+        
+        if (low >= high) {
+            return 0;
+        }
+            
+        int pivotIndex = choosePivot(array, low, high, pivotStrategy);
+        int comparisons = high - low;
+        pivotIndex = partition(array, low, high, pivotIndex);
+        comparisons += quicksort(array, low, pivotIndex-1, pivotStrategy);
+        comparisons += quicksort(array, pivotIndex+1, high, pivotStrategy);
+        return comparisons;
+    }
+    
+    /**
+     * Returns the index of the pivot, according to the chosen strategy. The 
+     * median-of-three strategy offers much better performance when the input 
+     * array is nearly sorted.
+     * 
+     * @param array
+     * @param low
+     * @param high
+     * @param strategy
+     * @return the index of the chosen pivot
+     */
+    private int choosePivot(int[] array, int low, int high,
+            PivotStrategy strategy) {
+        
+        if (strategy.equals(PivotStrategy.FIRST)) {
+            return low;
+        
+        } else if (strategy.equals(PivotStrategy.LAST)) {
+            return high;
+        
+        } else { // MEDIAN_OF_THREE
+            
+            int middle = (low + high) >>> 1;
+            
+            List list = Arrays.asList(array[low], array[middle], array[high]);
+            mergeSort(list);
+            
+            int median = (int) list.get(1);
+            
+            if (median == array[low]) {
+                return low;
+            
+            } 
+            
+            if (median == array[high]) {
+                return high;
+            }
+            
+            return middle;
+        }
+    }
+
+    /**
+     * Partitions the array around the pivot.
+     * 
+     * @param array
+     * @param low
+     * @param high
+     * @param pivotIndex new index for the pivot
+     * @return 
+     */
+    private int partition(int[] array, int low, int high, int pivotIndex) {
+        
+        if (pivotIndex > low) {
+            // swap with pivot with first element
+            swap(array, low, pivotIndex);
+        }
+        
+        int i = low + 1;
+        int j = i;
+        
+        while (j <= high) {
+            
+            if (array[j] < array[low]) {
+                swap(array, j, i);
+                i++;
+            }
+            
+            j++;
+        }
+        
+        // place pivot in the right place
+        swap(array, i-1, low);
+        
+        // returns new index for the pivot
+        return i-1;
+    }
+    
+    private void swap(int[] array, int i, int j) {
+        int aux = array[i];
+        array[i] = array[j];
+        array[j] = aux;
+    }
+    
+    public enum PivotStrategy {
+        
+        FIRST, LAST, MEDIAN_OF_THREE;
+    }
     
     /**
      * Sorts the specified list into ascending order, according to the
@@ -85,7 +218,8 @@ public class Sorting {
      * @param end
      * @return 
      */
-    private  <T extends Comparable> long merge(List<T> list, int start, int mid, int end) {
+    private  <T extends Comparable> long merge(List<T> list, int start, int mid,
+            int end) {
         
         int i = start;
         int j = mid + 1;
