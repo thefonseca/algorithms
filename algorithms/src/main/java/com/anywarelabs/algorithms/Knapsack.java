@@ -40,7 +40,6 @@ import java.util.logging.Logger;
  */
 public class Knapsack {
 
-    private int[][] items;
     private int maximumWeight;
     
     private int[][] processInput(InputStream in) {

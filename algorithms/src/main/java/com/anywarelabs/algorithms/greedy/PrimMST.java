@@ -39,11 +39,7 @@ public class PrimMST {
         Graph mst = new Graph(g.getVertices().size());
         mst.addVertex(0, mst.new Vertex());
         
-        Queue<Graph.Edge> queue = new PriorityQueue<>();
-        
-        for (Graph.Edge edge : g.getVertices().get(0).getEdges()) {
-            queue.add(edge);
-        }
+        Queue<Graph.Edge> queue = new PriorityQueue<>(g.getVertices().get(0).getEdges());
         
         while (queue.size() > 0) {
             

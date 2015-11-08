@@ -119,7 +119,7 @@ public class SortingTest {
             assertEquals(expected, list);
         }
         
-        InputStream in = Sorting.class.getResourceAsStream("QuickSort.txt");
+        InputStream in = SortingTest.class.getResourceAsStream("QuickSort.txt");
         List<Integer> list = processInput(in);
         
         long result = instance.quicksort(toArray(list), Sorting.PivotStrategy.FIRST);
