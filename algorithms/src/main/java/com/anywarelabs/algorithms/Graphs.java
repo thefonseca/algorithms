@@ -23,8 +23,16 @@
  */
 package com.anywarelabs.algorithms;
 
+import com.anywarelabs.algorithms.datastructures.DirectedGraph;
 import com.anywarelabs.algorithms.datastructures.Graph;
 import com.anywarelabs.algorithms.datastructures.Graph.Edge;
+import com.anywarelabs.algorithms.datastructures.KCluster;
+import com.anywarelabs.algorithms.datastructures.UndirectedGraph;
+import com.anywarelabs.algorithms.datastructures.UnionFind;
+import java.util.Collections;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Random;
 
 /**
@@ -65,12 +73,12 @@ public class Graphs {
         
         for (int i=0; i<reps; i++) {
             
-            Graph auxGraph = new Graph();
+            Graph auxGraph = new UndirectedGraph();
             Random rand = new Random();
             
             // copy g to auxGraph
             g.getEdges().stream().forEach((e) -> {
-                auxGraph.addEdge(e);
+                auxGraph.addEdge((Edge) e);
             });
             
             while (auxGraph.getVertexCount() > 2) {
@@ -82,7 +90,7 @@ public class Graphs {
                 }
                 
                 int chosenEdgeIndex = rand.nextInt(numEdges - 1) + 1;
-                Edge chosenEdge = auxGraph.getEdges().get(chosenEdgeIndex);
+                Edge chosenEdge = (Edge) auxGraph.getEdges().get(chosenEdgeIndex);
                 auxGraph.contractEdge(chosenEdge);
             }
             
@@ -98,6 +106,97 @@ public class Graphs {
         }
         
         return minCut;
+    }
+    
+    public static Graph getKruskalMST(UndirectedGraph g) {
+        
+        UnionFind unionFind = new UnionFind(g.getVertices().size());
+        
+        List<UndirectedGraph.UndirectedEdge> edges = g.getEdges();
+        Collections.sort(edges);
+        
+        Graph mst = new UndirectedGraph(g.getVertices().size());
+        
+        for (UndirectedGraph.UndirectedEdge edge : edges) {
+            
+            Integer either = edge.getEither();
+            Integer other = edge.getOther(either);
+            
+            if (!unionFind.connected(either, other)) {
+                
+                if (unionFind.getUnionCount() >= g.getVertices().size() - 1) {
+                    break;
+                }
+                
+                unionFind.union(either, other);
+                mst.addEdge(edge);
+            }
+        }
+        
+        return mst;
+    }
+    
+    public static Graph getPrimMST(UndirectedGraph g) {
+     
+        Graph mst = new UndirectedGraph(g.getVertices().size());
+        mst.addVertex(0, mst.new Vertex());
+        
+        Queue<UndirectedGraph.UndirectedEdge> queue = 
+                new PriorityQueue<>(g.getVertices().get(0).getEdges());
+        
+        while (queue.size() > 0) {
+            
+            UndirectedGraph.UndirectedEdge edge = queue.remove();
+            Integer either = edge.getEither();
+            Integer other = edge.getOther(either);
+            
+            if (mst.hasVertex(either) && mst.hasVertex(other)) {
+                continue;
+            }
+            
+            Integer vertexToAdd = mst.hasVertex(either) ? other : either;
+            
+            mst.addEdge(edge);
+            
+            for (UndirectedGraph.UndirectedEdge _edge : g.getVertices().get(vertexToAdd).getEdges()) {
+                
+                if (!_edge.equals(edge)) {
+                    queue.add(_edge);
+                }
+            }
+        }
+        
+        return mst;
+    }
+    
+    public static KCluster getKCluster(UndirectedGraph g, int clusterCount) {
+        
+        List<UndirectedGraph.UndirectedEdge> edges = g.getEdges();
+        Collections.sort(edges);
+        
+        KCluster cluster = new KCluster(g.getVertices().size(), clusterCount);
+        
+        for (UndirectedGraph.UndirectedEdge edge : edges) {
+            
+            Integer either = edge.getEither();
+            Integer other = edge.getOther(either);
+            
+            if (!cluster.connected(either, other)) {
+                
+                if (cluster.getSpacing() != null) {
+                    break;
+                }
+                
+                cluster.union(either, other, edge.getCost());
+            }
+        }
+        
+        return cluster;
+    }
+    
+    public List<DirectedGraph> getStronglyConnectedComponents(DirectedGraph g) {
+        
+        return null;
     }
     
 }

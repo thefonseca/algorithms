@@ -23,7 +23,6 @@
  */
 package com.anywarelabs.algorithms.greedy;
 
-import com.anywarelabs.algorithms.datastructures.Graph;
 import com.anywarelabs.algorithms.datastructures.KCluster;
 import java.io.InputStream;
 import org.junit.After;
@@ -59,53 +58,24 @@ public class MaxSpacingKClusteringTest {
     }
 
     /**
-     * Test of getKCluster method, of class MaxSpacingKClustering.
-     */
-    @Test
-    public void testGetKCluster() {
-        System.out.println("getMST");
-        
-        Graph g = new Graph(MaxSpacingKClustering.class.getResourceAsStream("edges2.txt"));
-        KCluster result = MaxSpacingKClustering.getKCluster(g, 2);
-        
-        Integer expResult = 67;
-        assertEquals(expResult, result.getSpacing());
-        
-        g = new Graph(MaxSpacingKClustering.class.getResourceAsStream("edges3.txt"));
-        result = MaxSpacingKClustering.getKCluster(g, 3);
-        
-        expResult = 20;
-        assertEquals(expResult, result.getSpacing());
-        
-        result = MaxSpacingKClustering.getKCluster(g, 2);
-        
-        expResult = 45;
-        assertEquals(expResult, result.getSpacing());
-        
-        g = new Graph(MaxSpacingKClustering.class.getResourceAsStream("clustering1.txt"));
-        result = MaxSpacingKClustering.getKCluster(g, 4);
-        System.out.println("Cluster spacing: " + result.getSpacing());
-    }
-
-    /**
      * Test of getKClusterBinaryStrings method, of class MaxSpacingKClustering.
      */
     @Test
     public void testGetKClusterBinaryStrings() {
         
-        InputStream in = MaxSpacingKClustering.class.getResourceAsStream("clustering_small2.txt");
+        InputStream in = MaxSpacingKClusteringTest.class.getResourceAsStream("clustering_small2.txt");
         KCluster result = MaxSpacingKClustering.getKClusterBinaryStrings(in, 2);
         
         int expResult = 2;
         assertEquals(expResult, result.getClusterCount());
         
-        in = MaxSpacingKClustering.class.getResourceAsStream("clustering_small.txt");
+        in = MaxSpacingKClusteringTest.class.getResourceAsStream("clustering_small.txt");
         result = MaxSpacingKClustering.getKClusterBinaryStrings(in, 2);
         
         expResult = 2;
         assertEquals(expResult, result.getClusterCount());
         
-        in = MaxSpacingKClustering.class.getResourceAsStream("clustering_big.txt");
+        in = MaxSpacingKClusteringTest.class.getResourceAsStream("clustering_big.txt");
         result = MaxSpacingKClustering.getKClusterBinaryStrings(in, 3);
         
         System.out.println("Max number of k: " + result.getClusterCount());

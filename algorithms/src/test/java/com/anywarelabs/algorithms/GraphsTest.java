@@ -24,7 +24,8 @@
 package com.anywarelabs.algorithms;
 
 import com.anywarelabs.algorithms.datastructures.Graph;
-import com.anywarelabs.algorithms.greedy.Scheduling;
+import com.anywarelabs.algorithms.datastructures.KCluster;
+import com.anywarelabs.algorithms.datastructures.UndirectedGraph;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +35,7 @@ import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -66,7 +68,7 @@ public class GraphsTest {
     /**
      * Test of getMinimumCut method, of class Graphs.
      */
-    @Test
+    //@Test
     public void testGetMinimumCut() {
         System.out.println("getMinimumCut");
         InputStream in = GraphsTest.class.getResourceAsStream("kargerMinCut_small_2.txt");
@@ -80,11 +82,88 @@ public class GraphsTest {
         System.out.println("Min cut: " + result.getEdges().size());
     }
     
+    /**
+     * Test of getMST method, of class KruskalMST.
+     */
+    @Test
+    public void testKruskalGetMST() {
+        System.out.println("getKruskalMST");
+        
+        UndirectedGraph g = processInputMST(GraphsTest.class.getResourceAsStream("edges2.txt"));
+        Graph result = Graphs.getKruskalMST(g);
+        
+        Integer expResult = 113;
+        assertEquals(expResult, result.getTotalEdgeCost());
+        
+        g = processInputMST(GraphsTest.class.getResourceAsStream("edges3.txt"));
+        result = Graphs.getKruskalMST(g);
+        
+        expResult = 89;
+        assertEquals(expResult, result.getTotalEdgeCost());
+        
+        g = processInputMST(GraphsTest.class.getResourceAsStream("edges1.txt"));
+        result = Graphs.getKruskalMST(g);
+        System.out.println("MST cost: " + result.getTotalEdgeCost());
+    }
+    
+    /**
+     * Test of getMST method, of class PrimMST.
+     */
+    @Test
+    public void testPrimGetMST() {
+        System.out.println("getPrimMST");
+        
+        UndirectedGraph g = processInputMST(GraphsTest.class.getResourceAsStream("edges2.txt"));
+        Graph result = Graphs.getPrimMST(g);
+        
+        Integer expResult = 113;
+        assertEquals(expResult, result.getTotalEdgeCost());
+        
+        g = processInputMST(GraphsTest.class.getResourceAsStream("edges3.txt"));
+        result = Graphs.getPrimMST(g);
+        
+        expResult = 89;
+        assertEquals(expResult, result.getTotalEdgeCost());
+        
+        g = processInputMST(GraphsTest.class.getResourceAsStream("edges1.txt"));
+        result = Graphs.getPrimMST(g);
+        System.out.println("MST cost: " + result.getTotalEdgeCost());
+    }
+    
+    /**
+     * Test of getKCluster method, of class MaxSpacingKClustering.
+     */
+    @Test
+    public void testGetKCluster() {
+        System.out.println("getMST");
+        
+        UndirectedGraph g = processInputMST(GraphsTest.class.getResourceAsStream("edges2.txt"));
+        KCluster result = Graphs.getKCluster(g, 2);
+        
+        Integer expResult = 67;
+        assertEquals(expResult, result.getSpacing());
+        
+        g = processInputMST(GraphsTest.class.getResourceAsStream("edges3.txt"));
+        result = Graphs.getKCluster(g, 3);
+        
+        expResult = 20;
+        assertEquals(expResult, result.getSpacing());
+        
+        result = Graphs.getKCluster(g, 2);
+        
+        expResult = 45;
+        assertEquals(expResult, result.getSpacing());
+        
+        g = processInputMST(GraphsTest.class.getResourceAsStream("clustering1.txt"));
+        result = Graphs.getKCluster(g, 4);
+        System.out.println("Cluster spacing: " + result.getSpacing());
+    }
+    
     private Graph processInput(InputStream in) {
         
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
             
-            Graph g = new Graph();
+            Graph g = new UndirectedGraph();
             String line;
             
             while((line = reader.readLine()) != null) {
@@ -93,16 +172,16 @@ public class GraphsTest {
                 
                 for (int i=1; i<lineSplit.length; i++) {
                     
-                    Graph.Edge edge = g.new Edge(
+                    Graph.Edge edge = g.createEdge(
                             Integer.parseInt(lineSplit[0]) - 1,
                             Integer.parseInt(lineSplit[i]) - 1, 1);
                     
-                    Graph.Edge inverseEdge = g.new Edge(edge.getOther(edge.getEither()), edge.getEither(), edge.getCost());
+                    Graph.Edge inverseEdge = edge.getReverse();
                     
                     if (!g.getEdges().contains(inverseEdge) && !g.getEdges().contains(edge)) {
                         g.addEdge(edge);
                     }
-                    Logger.getLogger(Scheduling.class.getName()).fine(edge.toString());
+                    Logger.getLogger(GraphsTest.class.getName()).fine(edge.toString());
                 }
             }
             
@@ -116,4 +195,42 @@ public class GraphsTest {
         return null;
     }
     
+    private UndirectedGraph processInputMST(InputStream in) {
+        
+        try(BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+            
+            String line = reader.readLine();
+            Integer vertexCount;
+            
+            if (line.contains(" ")) {
+                String[] lineSplit = line.split(" ");
+                vertexCount = Integer.parseInt(lineSplit[0]);
+                //Integer edgeCount = Integer.parseInt(lineSplit[1]);
+            
+            } else {
+                vertexCount = Integer.parseInt(line);
+            }
+            
+            UndirectedGraph g = new UndirectedGraph(vertexCount);
+            
+            while((line = reader.readLine()) != null) {
+                
+                String[] lineSplit = line.split(" ");
+                
+                UndirectedGraph.UndirectedEdge edge = g.createEdge(Integer.parseInt(lineSplit[0]) - 1,
+                                    Integer.parseInt(lineSplit[1]) - 1, 
+                                    Integer.parseInt(lineSplit[2]));
+                
+                g.addEdge(edge);
+                Logger.getLogger(GraphsTest.class.getName()).fine(edge.toString());
+            }
+            
+            return g;
+            
+        } catch(IOException ex) {
+            Logger.getLogger(UndirectedGraph.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
+    }
 }

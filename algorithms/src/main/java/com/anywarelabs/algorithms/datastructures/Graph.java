@@ -24,27 +24,21 @@
 
 package com.anywarelabs.algorithms.datastructures;
 
-import com.anywarelabs.algorithms.greedy.Scheduling;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import com.anywarelabs.algorithms.datastructures.Graph.Edge;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author marciofonseca
+ * @param <EdgeType>
  */
-public class Graph {
+public abstract class Graph<EdgeType extends Edge> {
     
     public class Vertex {
-        List<Edge> edges;
+        List<EdgeType> edges;
         
-        public void addEdge(Edge edge) {
+        public void addEdge(EdgeType edge) {
             
             if (edges == null) {
                 edges = new ArrayList<>();
@@ -53,7 +47,7 @@ public class Graph {
             edges.add(edge);
         }
         
-        public boolean removeEdge(Edge edge) {
+        public boolean removeEdge(EdgeType edge) {
             
             if (edges != null) {
                 return edges.remove(edge);
@@ -62,7 +56,7 @@ public class Graph {
             return false;
         }
 
-        public List<Edge> getEdges() {
+        public List<EdgeType> getEdges() {
             
             if (edges == null) {
                 edges = new ArrayList<>();
@@ -83,43 +77,22 @@ public class Graph {
         }
     }
     
-    public class Edge implements Comparable<Edge> {
-        private final Integer x;
-        private final Integer y;
-        private final Integer cost;
+    public abstract class Edge implements Comparable<EdgeType> {
+        protected Integer cost;
 
-        public Edge(Integer x, Integer y, Integer cost) {
-            this.x = x;
-            this.y = y;
-            this.cost = cost;
-        }
-
-        public Integer getEither() {
-            return x;
-        }
-        
-        public Integer getOther(Integer vertex) {
-            return vertex.equals(x) ? y : x;
-        }
-        
         public Integer getCost() {
             return cost;
         }
+
+        public void setCost(Integer cost) {
+            this.cost = cost;
+        }
+        
+        public abstract boolean containsVertex(int label);
+        public abstract EdgeType getReverse();
         
         @Override
-        public String toString() {
-            StringBuilder builder = new StringBuilder("Edge: ");
-            Integer vertex = getEither();
-            builder.append(vertex + 1);
-            builder.append(" -- ");
-            builder.append(getOther(vertex) + 1);
-            builder.append("; cost = ");
-            builder.append(getCost());
-            return builder.toString();
-        }
-
-        @Override
-        public int compareTo(Edge that) {
+        public int compareTo(EdgeType that) {
             
             if (this.cost == null) {
                 return 0;
@@ -127,41 +100,10 @@ public class Graph {
             
             return this.cost.compareTo(that.cost);
         }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            
-            final Edge other = (Edge) obj;
-            
-            if (!Objects.equals(this.x, other.x)) {
-                return false;
-            }
-            
-            if (!Objects.equals(this.y, other.y)) {
-                return false;
-            }
-            
-            return Objects.equals(this.cost, other.cost);
-        }
-        
-        @Override
-        public int hashCode() {
-            int hash = 7;
-            hash = 97 * hash + Objects.hashCode(this.x);
-            hash = 97 * hash + Objects.hashCode(this.y);
-            hash = 97 * hash + Objects.hashCode(this.cost);
-            return hash;
-        }
     }
     
     List<Vertex> vertices;
-    List<Edge> edges;
+    List<EdgeType> edges;
     Integer totalEdgeCost;
     
     public Graph() {
@@ -176,141 +118,13 @@ public class Graph {
         }
     }
     
-    public Graph(InputStream in) {
-        
-        try(BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
-            
-            String line = reader.readLine();
-            Integer vertexCount;
-            
-            if (line.contains(" ")) {
-                String[] lineSplit = line.split(" ");
-                vertexCount = Integer.parseInt(lineSplit[0]);
-                //Integer edgeCount = Integer.parseInt(lineSplit[1]);
-            
-            } else {
-                vertexCount = Integer.parseInt(line);
-            }
-            
-            vertices = new ArrayList<>(vertexCount);
-            
-            for (int i = 0; i < vertexCount; i++) {
-                vertices.add(null);
-            }
-            
-            while((line = reader.readLine()) != null) {
-                
-                String[] lineSplit = line.split(" ");
-                
-                Edge edge = new Edge(Integer.parseInt(lineSplit[0]) - 1,
-                                    Integer.parseInt(lineSplit[1]) - 1, 
-                                    Integer.parseInt(lineSplit[2]));
-                
-                addEdge(edge);
-                Logger.getLogger(Scheduling.class.getName()).fine(edge.toString());
-                
-            }
-            
-        } catch(IOException ex) {
-            Logger.getLogger(Scheduling.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-    }
+    public abstract void addEdge(EdgeType edge);
     
-    public final void addEdge(Edge edge) {
-        
-        if (totalEdgeCost == null) {
-            totalEdgeCost = 0;
-        }
-        
-        if (edges == null) {
-            edges = new ArrayList<>();
-        }
-        
-        if (edges.add(edge)) {
-            totalEdgeCost += edge.getCost();
-        }
-        
-        Integer either = edge.getEither();
-        Vertex vertex = getVertex(either);
-        
-        if (vertex == null) {
-            vertex = new Vertex();
-            addVertex(either, vertex);
-        }
-        
-        vertex.addEdge(edge);
-        
-        Integer other = edge.getOther(either);
-        vertex = getVertex(other);
-        
-        if (vertex == null) {
-            vertex = new Vertex();
-            addVertex(other, vertex);
-        }
-
-        vertex.addEdge(edge);
-    }
+    public abstract EdgeType createEdge(Integer x, Integer y, Integer cost);
     
-    public final boolean removeEdge(Edge edge) {
-        
-        //System.out.printf("Removing edge %s\n", edge.toString());
-        boolean removed = false;
-        
-        if (edges != null) {
-           removed = edges.remove(edge);
-        }
-        
-        if (removed) {
-            int either = edge.getEither();
-            int other = edge.getOther(either);
-
-            Vertex vEither = getVertex(either);
-            vEither.removeEdge(edge);
-
-            Vertex vOther = getVertex(other);
-            vOther.removeEdge(edge);
-
-            totalEdgeCost -= edge.getCost();
-        }
-        
-        //System.out.printf("Removed edge %s (%b)\n", edge.toString(), removed);
-        
-        return removed;
-    }
+    public abstract void contractEdge(EdgeType edge);
     
-    public final void contractEdge(Edge edge) {
-        
-        //System.out.println("======================");
-        //System.out.println("Vertex count: " + getVertexCount() + " || " + getEdges().size());
-        while(removeEdge(edge)){}
-        Graph.Edge inverseEdge = new Edge(edge.getOther(edge.getEither()), edge.getEither(), edge.getCost());
-        while(removeEdge(inverseEdge)){}
-        
-        int either = edge.getEither();
-        int other = edge.getOther(either);
-        
-        //Vertex vEither = getVertex(either);
-        Vertex vOther = getVertex(other);
-        
-        for (Edge e: vOther.getEdges()) {
-            
-            Edge newEdge;
-            
-            if (e.getEither().equals(other)) {
-                newEdge = new Edge(either, e.getOther(other), e.getCost());
-                
-            } else {
-                newEdge = new Edge(either, e.getEither(), e.getCost());
-            }
-            
-            //System.out.printf("Adding edge %s\n", newEdge.toString());
-            addEdge(newEdge);
-        }
-        
-        //System.out.printf("Removing vertex %d\n", other+1);
-        removeVertex(other);
-    }
+    public abstract boolean removeEdge(EdgeType edge);
     
     public final void addVertex(Integer label, Vertex vertex) {
         
@@ -328,9 +142,16 @@ public class Graph {
         
         if (vertices() != null) {
             
-            Vertex vertex = getVertex(label);
+            List<EdgeType> edgesToRemove =  new ArrayList<>();
             
-            for (Edge e: vertex.getEdges()) {
+            for (EdgeType e: edges) {
+                
+                if (e.containsVertex(label)) {
+                    edgesToRemove.add(e);
+                }
+            }
+            
+            for (EdgeType e: edgesToRemove) {
                 removeEdge(e);
             }
             
@@ -366,16 +187,6 @@ public class Graph {
     }
     
     public List<Vertex> getVertices() {
-        
-        /*List<Vertex> list = new ArrayList<>();
-        
-        for (Vertex v: vertices()) {
-            
-            if (v != null) {
-                list.add(v);
-            }
-        }*/
-        
         return new ArrayList<>(vertices());
     }
     
@@ -393,7 +204,7 @@ public class Graph {
         return count;
     }
     
-    public List<Edge> getEdges() {
+    public List<EdgeType> getEdges() {
         if (edges != null) {
             return new ArrayList<>(edges);
         }

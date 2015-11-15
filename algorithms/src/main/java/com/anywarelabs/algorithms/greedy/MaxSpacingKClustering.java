@@ -24,8 +24,6 @@
 
 package com.anywarelabs.algorithms.greedy;
 
-import com.anywarelabs.algorithms.datastructures.Graph;
-import com.anywarelabs.algorithms.datastructures.Graph.Edge;
 import com.anywarelabs.algorithms.datastructures.KCluster;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,7 +31,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
@@ -45,32 +42,6 @@ import java.util.logging.Logger;
  * @author Marcio Fonseca
  */
 public class MaxSpacingKClustering {
-    
-    public static KCluster getKCluster(Graph g, int clusterCount) {
-        
-        List<Edge> edges = g.getEdges();
-        Collections.sort(edges);
-        
-        KCluster cluster = new KCluster(g.getVertices().size(), clusterCount);
-        
-        for (Edge edge : edges) {
-            
-            Integer either = edge.getEither();
-            Integer other = edge.getOther(either);
-            
-            if (!cluster.connected(either, other)) {
-                
-                if (cluster.getSpacing() != null) {
-                    break;
-                }
-                
-                cluster.union(either, other, edge.getCost());
-            }
-        }
-        
-        return cluster;
-    }
-    
     
     public static KCluster getKClusterBinaryStrings(InputStream in, int minSpacing) {
         
@@ -118,7 +89,7 @@ public class MaxSpacingKClustering {
             return createCluster(nodes, allNodes, bitCount, minSpacing);
             
         } catch(IOException ex) {
-            Logger.getLogger(Scheduling.class.getName())
+            Logger.getLogger(MaxSpacingKClustering.class.getName())
                     .log(Level.SEVERE, null, ex);
         }
         
@@ -172,13 +143,5 @@ public class MaxSpacingKClustering {
         }
         
         return changes;
-    }
-    
-    public static void main(String[] args) {
-        InputStream in = MaxSpacingKClustering.class.getResourceAsStream("clustering_big.txt");
-        KCluster result;
-        result = MaxSpacingKClustering.getKClusterBinaryStrings(in, 3);
-        
-        System.out.println("Max number of k: " + result.getClusterCount());
     }
 }
