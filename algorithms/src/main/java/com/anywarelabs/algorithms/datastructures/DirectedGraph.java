@@ -26,6 +26,7 @@ package com.anywarelabs.algorithms.datastructures;
 
 import com.anywarelabs.algorithms.datastructures.DirectedGraph.DirectedEdge;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -35,8 +36,8 @@ import java.util.Objects;
 public class DirectedGraph extends Graph<DirectedEdge> {
 
     public class DirectedEdge extends Graph.Edge {
-        private final Integer source;
-        private final Integer target;
+        private Integer source;
+        private Integer target;
         
         public DirectedEdge(Integer source, Integer target, Integer cost) {
             this.source = source;
@@ -50,6 +51,14 @@ public class DirectedGraph extends Graph<DirectedEdge> {
 
         public Integer getTarget() {
             return target;
+        }
+
+        public void setSource(Integer source) {
+            this.source = source;
+        }
+
+        public void setTarget(Integer target) {
+            this.target = target;
         }
         
         @Override
@@ -201,5 +210,31 @@ public class DirectedGraph extends Graph<DirectedEdge> {
     @Override
     public DirectedEdge createEdge(Integer x, Integer y, Integer cost) {
         return new DirectedEdge(x, y, cost);
+    }
+    
+    @Override
+    public List<Integer> getConnectedVertices(int vertex) {
+        
+        Vertex v = getVertex(vertex);
+        List<Integer> connected = new ArrayList<>();
+        
+        for (DirectedEdge edge: v.getEdges()) {
+            connected.add(edge.getTarget());
+        }
+        
+        return connected;
+    }
+    
+    public void reverseEdge(DirectedEdge edge) {
+        
+        Vertex sourceVertex = getVertex(edge.getSource());
+        sourceVertex.removeEdge(edge);
+        
+        Vertex targetVertex = getVertex(edge.getTarget());
+        targetVertex.addEdge(edge);
+        
+        Integer source = edge.getSource();
+        edge.setSource(edge.getTarget());
+        edge.setTarget(source);
     }
 }

@@ -26,6 +26,7 @@ package com.anywarelabs.algorithms.datastructures;
 
 import com.anywarelabs.algorithms.datastructures.UndirectedGraph.UndirectedEdge;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -222,5 +223,24 @@ public class UndirectedGraph extends Graph<UndirectedEdge>{
     @Override
     public UndirectedEdge createEdge(Integer x, Integer y, Integer cost) {
         return new UndirectedEdge(x, y, cost);
+    }
+    
+    @Override
+    public List<Integer> getConnectedVertices(int vertex) {
+        
+        Vertex v = getVertex(vertex);
+        List<Integer> connected = new ArrayList<>();
+        
+        for (UndirectedEdge edge: v.getEdges()) {
+            
+            if (edge.getEither().equals(vertex)) {
+                connected.add(edge.getOther(vertex));
+            
+            } else {
+                connected.add(edge.getEither());
+            }
+        }
+        
+        return connected;
     }
 }

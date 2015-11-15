@@ -23,6 +23,7 @@
  */
 package com.anywarelabs.algorithms;
 
+import com.anywarelabs.algorithms.datastructures.DirectedGraph;
 import com.anywarelabs.algorithms.datastructures.Graph;
 import com.anywarelabs.algorithms.datastructures.KCluster;
 import com.anywarelabs.algorithms.datastructures.UndirectedGraph;
@@ -30,6 +31,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.After;
@@ -68,22 +73,22 @@ public class GraphsTest {
     /**
      * Test of getMinimumCut method, of class Graphs.
      */
-    //@Test
+    @Test
     public void testGetMinimumCut() {
         System.out.println("getMinimumCut");
         InputStream in = GraphsTest.class.getResourceAsStream("kargerMinCut_small_2.txt");
-        Graph g = processInput(in);
+        Graph g = processInputMinCut(in);
         Graph result = Graphs.getMinimumCut(g);
         Assert.assertEquals(2, result.getEdges().size());
         
         in = GraphsTest.class.getResourceAsStream("kargerMinCut.txt");
-        g = processInput(in);
+        g = processInputMinCut(in);
         result = Graphs.getMinimumCut(g);
         System.out.println("Min cut: " + result.getEdges().size());
     }
     
     /**
-     * Test of getMST method, of class KruskalMST.
+     * Test of getMST method, of class Graphs.
      */
     @Test
     public void testKruskalGetMST() {
@@ -107,7 +112,7 @@ public class GraphsTest {
     }
     
     /**
-     * Test of getMST method, of class PrimMST.
+     * Test of getMST method, of class Graphs.
      */
     @Test
     public void testPrimGetMST() {
@@ -131,7 +136,7 @@ public class GraphsTest {
     }
     
     /**
-     * Test of getKCluster method, of class MaxSpacingKClustering.
+     * Test of getKCluster method, of class Graphs.
      */
     @Test
     public void testGetKCluster() {
@@ -159,7 +164,74 @@ public class GraphsTest {
         System.out.println("Cluster spacing: " + result.getSpacing());
     }
     
-    private Graph processInput(InputStream in) {
+    /**
+     * Test of getStronglyConnectedComponents method, of class Graphs.
+     */
+    @Test
+    public void testGetStronglyConnectedComponents() {
+        
+        int sccOutputCount = 5;
+        
+        DirectedGraph g = processInputSCC(GraphsTest.class.getResourceAsStream("SCC-small1.txt"));
+        List<List<Integer>> sccs = Graphs.getStronglyConnectedComponents(g);
+        String result = getSCCSizesString(sccs, sccOutputCount);
+        assertEquals("3,3,3,0,0", result);
+        
+        g = processInputSCC(GraphsTest.class.getResourceAsStream("SCC-small2.txt"));
+        sccs = Graphs.getStronglyConnectedComponents(g);
+        result = getSCCSizesString(sccs, sccOutputCount);
+        assertEquals("3,3,2,0,0", result);
+        
+        g = processInputSCC(GraphsTest.class.getResourceAsStream("SCC-small3.txt"));
+        sccs = Graphs.getStronglyConnectedComponents(g);
+        result = getSCCSizesString(sccs, sccOutputCount);
+        assertEquals("3,3,1,1,0", result);
+        
+        g = processInputSCC(GraphsTest.class.getResourceAsStream("SCC-small4.txt"));
+        sccs = Graphs.getStronglyConnectedComponents(g);
+        result = getSCCSizesString(sccs, sccOutputCount);
+        assertEquals("7,1,0,0,0", result);
+        
+        g = processInputSCC(GraphsTest.class.getResourceAsStream("SCC-small5.txt"));
+        sccs = Graphs.getStronglyConnectedComponents(g);
+        result = getSCCSizesString(sccs, sccOutputCount);
+        assertEquals("6,3,2,1,0", result);
+        
+        g = processInputSCC(GraphsTest.class.getResourceAsStream("SCC.txt"));
+        sccs = Graphs.getStronglyConnectedComponents(g);
+        result = getSCCSizesString(sccs, sccOutputCount);
+        System.out.printf("Largest SCCs: %s", result);
+    }
+    
+    private String getSCCSizesString(List<List<Integer>> sccs, int count) {
+        String result = "";
+        
+        List<List<Integer>> ordered = new ArrayList<>();
+        
+        for (List<Integer> component: sccs) {
+            ordered.add(new ComparableArrayList(component));
+        }
+        
+        Collections.sort(ordered, Collections.reverseOrder());
+        
+        for (int i=0; i<count && i<ordered.size(); i++) {
+            
+            if (i > 0) {
+                result += ",";
+            }
+            
+            result += ordered.get(i).size();
+        }
+        
+        for (int i=0; i<(count - ordered.size()); i++) {
+            
+            result += ",0";
+        }
+        
+        return result;
+    }
+    
+    private Graph processInputMinCut(InputStream in) {
         
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
             
@@ -181,7 +253,7 @@ public class GraphsTest {
                     if (!g.getEdges().contains(inverseEdge) && !g.getEdges().contains(edge)) {
                         g.addEdge(edge);
                     }
-                    Logger.getLogger(GraphsTest.class.getName()).fine(edge.toString());
+                    //Logger.getLogger(GraphsTest.class.getName()).fine(edge.toString());
                 }
             }
             
@@ -222,7 +294,7 @@ public class GraphsTest {
                                     Integer.parseInt(lineSplit[2]));
                 
                 g.addEdge(edge);
-                Logger.getLogger(GraphsTest.class.getName()).fine(edge.toString());
+                //Logger.getLogger(GraphsTest.class.getName()).fine(edge.toString());
             }
             
             return g;
@@ -232,5 +304,51 @@ public class GraphsTest {
         }
         
         return null;
+    }
+    
+    private DirectedGraph processInputSCC(InputStream in) {
+        
+        try(BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+            
+            DirectedGraph g = new DirectedGraph();
+            String line;
+            
+            while((line = reader.readLine()) != null) {
+                
+                String[] lineSplit = line.split(" ");
+                
+                DirectedGraph.DirectedEdge edge = g.createEdge(
+                        Integer.parseInt(lineSplit[0]) - 1,
+                        Integer.parseInt(lineSplit[1]) - 1, 1);
+                
+                g.addEdge(edge);
+                //Logger.getLogger(GraphsTest.class.getName()).fine(edge.toString());
+            }
+            
+            return g;
+            
+        } catch(IOException ex) {
+            Logger.getLogger(UndirectedGraph.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
+    }
+    
+    class ComparableArrayList extends ArrayList implements Comparable<ComparableArrayList> {
+
+        public ComparableArrayList(Collection c) {
+            super(c);
+        }
+        
+        @Override
+        public int compareTo(ComparableArrayList o) {
+            
+            if (o == null) {
+                return 0;
+            }
+            
+            return Integer.valueOf(this.size()).compareTo(o.size());
+        }
+        
     }
 }

@@ -33,7 +33,7 @@ import java.util.List;
  * @author marciofonseca
  * @param <EdgeType>
  */
-public abstract class Graph<EdgeType extends Edge> {
+public abstract class Graph<EdgeType extends Edge> implements Comparable<Graph> {
     
     public class Vertex {
         List<EdgeType> edges;
@@ -61,7 +61,8 @@ public abstract class Graph<EdgeType extends Edge> {
             if (edges == null) {
                 edges = new ArrayList<>();
             }
-            return new ArrayList<>(edges);
+            //return new ArrayList<>(edges);
+            return edges;
         }
         
         @Override
@@ -105,6 +106,7 @@ public abstract class Graph<EdgeType extends Edge> {
     List<Vertex> vertices;
     List<EdgeType> edges;
     Integer totalEdgeCost;
+    int vertexCount = 0;
     
     public Graph() {
     }
@@ -126,6 +128,8 @@ public abstract class Graph<EdgeType extends Edge> {
     
     public abstract boolean removeEdge(EdgeType edge);
     
+    public abstract List<Integer> getConnectedVertices(int vertex);
+    
     public final void addVertex(Integer label, Vertex vertex) {
         
         int size = vertices().size();
@@ -135,6 +139,7 @@ public abstract class Graph<EdgeType extends Edge> {
             }
         }
         
+        vertexCount++;
         vertices().set(label, vertex);
     }
     
@@ -155,6 +160,7 @@ public abstract class Graph<EdgeType extends Edge> {
                 removeEdge(e);
             }
             
+            vertexCount--;
             vertices().set(label, null);
         }
     }
@@ -190,9 +196,9 @@ public abstract class Graph<EdgeType extends Edge> {
         return new ArrayList<>(vertices());
     }
     
-    public int getVertexCount() {
+    public int size() {
         
-        int count = 0;
+        /*int count = 0;
         
         for (Vertex v: vertices()) {
             
@@ -201,7 +207,8 @@ public abstract class Graph<EdgeType extends Edge> {
             }
         }
         
-        return count;
+        return count;*/
+        return vertexCount;
     }
     
     public List<EdgeType> getEdges() {
@@ -226,5 +233,11 @@ public abstract class Graph<EdgeType extends Edge> {
         }
 
         return builder.toString();
+    }
+
+    @Override
+    public int compareTo(Graph o) {
+        return Integer.valueOf(this.vertices().size()).compareTo(
+                o.vertices().size());
     }
 }

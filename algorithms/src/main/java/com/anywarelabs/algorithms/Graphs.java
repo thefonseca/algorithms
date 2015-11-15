@@ -29,6 +29,7 @@ import com.anywarelabs.algorithms.datastructures.Graph.Edge;
 import com.anywarelabs.algorithms.datastructures.KCluster;
 import com.anywarelabs.algorithms.datastructures.UndirectedGraph;
 import com.anywarelabs.algorithms.datastructures.UnionFind;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -50,7 +51,7 @@ public class Graphs {
      * @return 
      */
     public static Graph getMinimumCut(Graph g) {
-        int vertexCount = g.getVertexCount();
+        int vertexCount = g.size();
         //int reps = (int) (vertexCount * vertexCount * Math.log(vertexCount));
         int reps = (int) (vertexCount * 2);
         return getMinimumCut(g, reps);
@@ -81,7 +82,7 @@ public class Graphs {
                 auxGraph.addEdge((Edge) e);
             });
             
-            while (auxGraph.getVertexCount() > 2) {
+            while (auxGraph.size() > 2) {
 
                 int numEdges = auxGraph.getEdges().size();
                 
@@ -194,9 +195,74 @@ public class Graphs {
         return cluster;
     }
     
-    public List<DirectedGraph> getStronglyConnectedComponents(DirectedGraph g) {
+    /**
+     * Kosaraju-Sharir algorithm to find the strongly connected components of a 
+     * directed graph.
+     * 
+     * @param g
+     * @return 
+     */
+    public static List<List<Integer>> getStronglyConnectedComponents(DirectedGraph g) {
         
-        return null;
+        Graphs.reverse(g);
+        List<Integer> reversePostOrder = getReversePostOrder(g);
+        
+        Graphs.reverse(g);
+        List<List<Integer>> sccs = new ArrayList<>();
+        boolean[] visited = new boolean[g.size()];
+        
+        for (int i=0; i<visited.length; i++) {
+            visited[i] = false;
+        }
+        
+        DFS dfs = new DFS(g);
+        
+        for (Integer i: reversePostOrder) {
+            
+            if (!visited[i]) {
+                dfs.search(i);
+                sccs.add(dfs.getOrder());
+                
+                for (Integer j: dfs.getOrder()) {
+                    visited[j] = true;
+                }
+            }
+        }
+        
+        return sccs;
     }
     
+    private static List<Integer> getReversePostOrder(DirectedGraph g) {
+        
+        List<Integer> postOrder = new ArrayList<>();
+        boolean[] visited = new boolean[g.size()];
+        
+        for (int i=0; i<visited.length; i++) {
+            visited[i] = false;
+        }
+        
+        DFS dfs = new DFS(g);
+        
+        for (int i=0; i<g.size(); i++) {
+            
+            if (!visited[i]) {
+                dfs.search(i);
+                postOrder.addAll(dfs.getPostOrder());
+                
+                for (Integer j: dfs.getOrder()) {
+                    visited[j] = true;
+                }
+            }
+        }
+        
+        Collections.reverse(postOrder);
+        return postOrder;
+    }
+    
+    public static void reverse(DirectedGraph g) {
+        
+        for (DirectedGraph.DirectedEdge e: g.getEdges()) {
+            g.reverseEdge(e);
+        }
+    }
 }
