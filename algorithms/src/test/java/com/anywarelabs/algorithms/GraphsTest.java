@@ -203,6 +203,53 @@ public class GraphsTest {
         System.out.printf("Largest SCCs: %s", result);
     }
     
+    /**
+     * Test of dijkstra method, of class Graphs.
+     */
+    @Test
+    public void testDijkstra() {
+        
+        DirectedGraph g = processInputDijkstra(GraphsTest.class.getResourceAsStream("dijkstraData-small1.txt"));
+        Integer[] costs = Graphs.dijkstra(g, 0);
+        String result = getDistancesString(costs, 1, 2, 3, 4);
+        assertEquals("0,3,3,5", result);
+        
+        g = processInputDijkstra(GraphsTest.class.getResourceAsStream("dijkstraData-small2.txt"));
+        costs = Graphs.dijkstra(g, 0);
+        result = getDistancesString(costs, 1, 2, 3, 4);
+        assertEquals("0,3,4,5", result);
+        
+        g = processInputDijkstra(GraphsTest.class.getResourceAsStream("dijkstraData-small3.txt"));
+        costs = Graphs.dijkstra(g, 0);
+        result = getDistancesString(costs, 1, 2, 3, 4, 5, 6, 7, 8);
+        assertEquals("0,1,2,3,4,4,3,2", result);
+        
+        g = processInputDijkstra(GraphsTest.class.getResourceAsStream("dijkstraData.txt"));
+        costs = Graphs.dijkstra(g, 0);
+        result = getDistancesString(costs, 7, 37, 59, 82, 99, 115, 133, 165, 188, 197);
+        System.out.println("Shortest paths: " + result);
+    }
+    
+    private String getDistancesString(Integer[] distances, int... vertices) {
+        
+        StringBuilder builder = new StringBuilder("");
+        
+        for (int i=0; i<vertices.length; i++) {
+            if (i>0) {
+                builder.append(",");
+            }
+            
+            if (distances[vertices[i]-1] == null) {
+                builder.append(1000000);
+                
+            } else {
+                builder.append(distances[vertices[i]-1]);
+            }
+        }
+        
+        return builder.toString();
+    }
+    
     private String getSCCSizesString(List<List<Integer>> sccs, int count) {
         String result = "";
         
@@ -229,6 +276,43 @@ public class GraphsTest {
         }
         
         return result;
+    }
+    
+    private DirectedGraph processInputDijkstra(InputStream in) {
+        
+        try(BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+            
+            DirectedGraph g = new DirectedGraph();
+            String line;
+            
+            while((line = reader.readLine()) != null) {
+                
+                String[] lineSplit = line.split("( )+|\t");
+                
+                for (int i=1; i<lineSplit.length; i++) {
+                    
+                    String[] edgeSplit = lineSplit[i].split(",");
+                    
+                    DirectedGraph.DirectedEdge edge = g.createEdge(
+                            Integer.parseInt(lineSplit[0]) - 1,
+                            Integer.parseInt(edgeSplit[0]) - 1, 
+                            Integer.parseInt(edgeSplit[1]));
+                    
+                    if (!g.getEdges().contains(edge)) {
+                        g.addEdge(edge);
+                    }
+                    //Logger.getLogger(GraphsTest.class.getName()).fine(edge.toString());
+                }
+            }
+            
+            return g;
+            
+        } catch(IOException ex) {
+            Logger.getLogger(GraphsTest.class.getName())
+                    .log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
     }
     
     private Graph processInputMinCut(InputStream in) {
@@ -333,7 +417,7 @@ public class GraphsTest {
         
         return null;
     }
-    
+
     class ComparableArrayList extends ArrayList implements Comparable<ComparableArrayList> {
 
         public ComparableArrayList(Collection c) {

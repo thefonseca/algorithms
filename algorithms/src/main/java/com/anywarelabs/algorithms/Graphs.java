@@ -30,11 +30,14 @@ import com.anywarelabs.algorithms.datastructures.KCluster;
 import com.anywarelabs.algorithms.datastructures.UndirectedGraph;
 import com.anywarelabs.algorithms.datastructures.UnionFind;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
+import java.util.Set;
 
 /**
  *
@@ -193,6 +196,75 @@ public class Graphs {
         }
         
         return cluster;
+    }
+    
+    /**
+     * Dijkstra's algorithm for finding shortest paths between nodes in a graph.
+     * This algorithm is valid for graphs that don't have negative cost edges.
+     * 
+     * @param g
+     * @param source
+     * @return array with shortest paths from source vertex to every other 
+     * reachable vertex.
+     */
+    public static Integer[] dijkstra(DirectedGraph g, int source) {
+        
+        Integer[] distances = new Integer[g.size()];
+        Set<Integer> notVisited = new HashSet<>();
+        
+        for (int i=0; i<distances.length; i++) {
+            distances[i] = null;
+            notVisited.add(i);
+        }
+        
+        distances[source] = 0;
+        
+        while (!notVisited.isEmpty()) {
+            
+            int nextVertex = extractMinimumDistanceVertex(notVisited, distances);
+            
+            for (DirectedGraph.DirectedEdge e: g.getVertex(nextVertex).getEdges()) {
+                
+                int dist = e.getCost() + distances[nextVertex];
+                if (distances[e.getTarget()] == null || distances[e.getTarget()].compareTo(dist) > 0) {
+                    distances[e.getTarget()] = dist;
+                }
+            }
+        }
+        
+        return distances;
+    }
+    
+    /**
+     * Naive implementation to find the vertex with minimum greedy choice 
+     * criteria: distance[u] + edge_cost(u,v). 
+     * 
+     * Could be improved using a min heap.
+     * 
+     * @param notVisited
+     * @param distances
+     * @return 
+     */
+    private static int extractMinimumDistanceVertex(Collection<Integer> notVisited, 
+            Integer[] distances) {
+        
+        Integer min = null;
+        int minVertex = 0;
+        
+        for (Integer v: notVisited) {
+
+            if (distances[v] != null) {
+
+                if (min == null || distances[v].compareTo(min) < 0) {
+                    min = distances[v];
+                    minVertex = v;
+                }
+            }
+        }
+        
+        notVisited.remove(minVertex);
+        
+        return minVertex;
     }
     
     /**
